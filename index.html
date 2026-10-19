@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#090d0e">
+  <title>Apex Racing 3D</title>
+  <link rel="stylesheet" href="style.css">
+
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "https://cdn.jsdelivr.net/npm/three@0.164.1/build/three.module.js"
+      }
+    }
+  </script>
+</head>
+<body>
+<main id="game">
+  <canvas id="world"></canvas>
+
+  <header class="topbar">
+    <button class="brand" data-screen="home">
+      <span class="brand-mark">A</span>
+      <span><strong>APEX</strong><small>RACING 3D</small></span>
+    </button>
+
+    <div class="top-center">
+      <span class="live-dot"></span>
+      <span id="session-label">GARAGE</span>
+    </div>
+
+    <div class="wallet">CREDITS <strong id="credits">1500</strong></div>
+    <button id="sound-btn" class="icon-button">♫ SOUND</button>
+  </header>
+
+  <section id="race-hud" class="race-hud hidden">
+    <div class="hud-card">
+      <small>POSITION</small>
+      <div><strong id="position">4</strong><span> / 4</span></div>
+    </div>
+    <div class="hud-card">
+      <small>LAP</small>
+      <div><strong id="lap">1</strong><span> / 3</span></div>
+      <div class="lap-line"><i id="lap-progress"></i></div>
+    </div>
+    <div class="hud-card">
+      <small>RACE TIME</small>
+      <strong id="race-time">00:00.000</strong>
+    </div>
+  </section>
+
+  <section id="speed-panel" class="speed-panel hidden">
+    <div class="gear-row"><span id="drive-mode">SPORT</span><span>GEAR <b id="gear">1</b></span></div>
+    <div class="speed-number"><strong id="speed">000</strong><span>KM/H</span></div>
+    <div class="rpm-track"><i id="rpm-bar"></i></div>
+    <div class="speed-bottom"><span>RPM</span><b id="rpm">1200</b><span id="abs">ABS</span></div>
+  </section>
+
+  <section id="minimap-wrap" class="minimap-wrap hidden">
+    <div class="mini-title">CIRCUIT MAP</div>
+    <canvas id="minimap" width="200" height="150"></canvas>
+  </section>
+
+  <div id="center-message" class="center-message"></div>
+  <div id="toast" class="toast">WELCOME TO APEX</div>
+
+  <!-- MAIN MENU -->
+  <section id="home-screen" class="overlay">
+    <div class="menu-card">
+      <div class="eyebrow"><span class="live-dot"></span> NEXT-GEN MOTORSPORT</div>
+      <h1>OWN THE<br><em>APEX.</em></h1>
+      <p class="menu-copy">Build your machine. Master the circuit. Take the podium.</p>
+
+      <div class="menu-stats">
+        <div><small>SELECTED CAR</small><strong id="home-car">FORMULA RACER</strong></div>
+        <div><small>CIRCUIT</small><strong id="home-track">COASTAL GP</strong></div>
+        <div><small>BEST RESULT</small><strong id="best-result">NO RECORD</strong></div>
+      </div>
+
+      <button id="start-btn" class="primary-button">START RACE <span>↗</span></button>
+
+      <div class="menu-grid">
+        <button class="menu-option" data-screen="garage"><b>01</b> GARAGE <span>↗</span></button>
+        <button class="menu-option" data-screen="tracks"><b>02</b> CIRCUITS <span>↗</span></button>
+        <button class="menu-option" data-screen="upgrades"><b>03</b> UPGRADES <span>↗</span></button>
+        <button class="menu-option" data-screen="controls"><b>04</b> CONTROLS <span>↗</span></button>
+      </div>
+    </div>
+    <div class="menu-side-note">APEX MOTORSPORT // EST. 2026</div>
+  </section>
+
+  <!-- GARAGE -->
+  <section id="garage-screen" class="overlay hidden">
+    <div class="management-card">
+      <button class="back-button" data-screen="home">← MAIN MENU</button>
+      <div class="eyebrow">YOUR COLLECTION</div>
+      <h2>THE <em>GARAGE.</em></h2>
+      <p class="menu-copy">Choose your machine. Every car has its own strengths.</p>
+
+      <div id="car-list" class="car-list"></div>
+      <div id="car-details" class="car-details"></div>
+      <button id="select-car-btn" class="primary-button">SELECT CAR <span>↗</span></button>
+    </div>
+  </section>
+
+  <!-- TRACK SELECT -->
+  <section id="tracks-screen" class="overlay hidden">
+    <div class="management-card">
+      <button class="back-button" data-screen="home">← MAIN MENU</button>
+      <div class="eyebrow">FOUR WORLDS. ONE GRID.</div>
+      <h2>CHOOSE YOUR <em>CIRCUIT.</em></h2>
+      <div id="track-list" class="track-list"></div>
+      <button id="select-track-btn" class="primary-button">SET CIRCUIT <span>↗</span></button>
+    </div>
+  </section>
+
+  <!-- UPGRADES -->
+  <section id="upgrades-screen" class="overlay hidden">
+    <div class="management-card">
+      <button class="back-button" data-screen="home">← MAIN MENU</button>
+      <div class="eyebrow">ENGINEERING DEPARTMENT</div>
+      <h2>BUILD A <em>BEAST.</em></h2>
+      <p class="menu-copy">Upgrades are saved in this browser. Each level improves your selected car.</p>
+      <div id="upgrade-list" class="upgrade-list"></div>
+    </div>
+  </section>
+
+  <!-- CONTROLS -->
+  <section id="controls-screen" class="overlay hidden">
+    <div class="management-card">
+      <button class="back-button" data-screen="home">← MAIN MENU</button>
+      <div class="eyebrow">DRIVER TRAINING PROGRAM</div>
+      <h2>LEARN THE <em>LINES.</em></h2>
+
+      <div class="controls-grid">
+        <div class="control-row"><kbd>W</kbd><kbd>↑</kbd><span><b>Accelerate</b><small>Build speed on straights</small></span></div>
+        <div class="control-row"><kbd>S</kbd><kbd>↓</kbd><span><b>Brake / Reverse</b><small>Slow down before corners</small></span></div>
+        <div class="control-row"><kbd>A</kbd><kbd>D</kbd><span><b>Steer</b><small>Left and right steering</small></span></div>
+        <div class="control-row"><kbd>SPACE</kbd><span><b>Handbrake</b><small>Initiate a controlled slide</small></span></div>
+        <div class="control-row"><kbd>C</kbd><span><b>Change camera</b><small>Chase, cockpit, hood and TV</small></span></div>
+        <div class="control-row"><kbd>ESC</kbd><span><b>Pause</b><small>Pause or resume the session</small></span></div>
+        <div class="control-row"><kbd>R</kbd><span><b>Recover car</b><small>Return to the track if stuck</small></span></div>
+      </div>
+
+      <div class="tip-box">
+        <strong>RACING TIP</strong>
+        <p>Brake before entering a corner, turn smoothly, and accelerate as you straighten the car. Hitting barriers costs speed.</p>
+      </div>
+      <button id="tutorial-btn" class="primary-button">START DRIVING TUTORIAL <span>↗</span></button>
+    </div>
+  </section>
+
+  <!-- PAUSE -->
+  <section id="pause-screen" class="overlay hidden">
+    <div class="small-card">
+      <div class="eyebrow">SESSION CONTROL</div>
+      <h2>RACE <em>PAUSED.</em></h2>
+      <p>Your session is waiting.</p>
+      <button id="resume-btn" class="primary-button">RESUME RACE <span>↗</span></button>
+      <button id="restart-btn" class="secondary-button">RESTART SESSION</button>
+      <button class="secondary-button" data-screen="home">EXIT TO MENU</button>
+      <div class="controls-hint">PRESS ESC TO RESUME</div>
+    </div>
+  </section>
+
+  <!-- FINISH -->
+  <section id="finish-screen" class="overlay hidden">
+    <div class="small-card">
+      <div class="eyebrow"><span class="live-dot"></span> CHEQUERED FLAG</div>
+      <h2 id="finish-title">RACE <em>COMPLETE.</em></h2>
+      <p id="finish-copy">The circuit has a new story.</p>
+      <div class="result-time"><small>YOUR TIME</small><strong id="final-time">00:00.000</strong></div>
+      <div class="result-time"><small>RACE REWARD</small><strong id="race-reward">+0 CR</strong></div>
+      <button id="again-btn" class="primary-button">RACE AGAIN <span>↗</span></button>
+      <button class="secondary-button" data-screen="home">MAIN MENU</button>
+    </div>
+  </section>
+
+  <footer id="bottom-hud" class="bottom-hud hidden">
+    <div class="track-label"><span class="track-icon">⌁</span><div><strong id="footer-track">COASTAL GP</strong><small>TRACK TEMPERATURE <b>31°C</b></small></div></div>
+    <div class="driving-controls"><span><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> DRIVE</span><span><kbd>SPACE</kbd> HANDBRAKE</span><span><kbd>C</kbd> CAMERA</span><span><kbd>ESC</kbd> PAUSE</span></div>
+    <div class="camera-label"><span class="camera-dot"></span><span id="camera-name">CHASE CAM</span></div>
+  </footer>
+</main>
+<script type="module" src="script.js"></script>
+</body>
+</html>
